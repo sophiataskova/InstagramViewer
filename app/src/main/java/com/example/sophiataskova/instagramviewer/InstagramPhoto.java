@@ -1,13 +1,13 @@
 package com.example.sophiataskova.instagramviewer;
 
-/**
- * Created by sophiataskova on 9/14/14.
- */
+import java.util.ArrayList;
+
 public class InstagramPhoto {
     public String imageUrl;
+    public String profilePicUrl;
     public String caption;
     public String username;
     public int imageHeight;
     public int likesCount;
-
+    public ArrayList<Comment> topComments;
 }

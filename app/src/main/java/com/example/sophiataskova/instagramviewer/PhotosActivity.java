@@ -2,6 +2,7 @@ package com.example.sophiataskova.instagramviewer;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -22,31 +23,54 @@ public class PhotosActivity extends Activity {
     public static final String CLIENT_ID = "1f10807b32284294bedf56273ccd3627";
     private ArrayList<InstagramPhoto> photos;
     private InstagramPhotosAdapter aPhotos;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photos);
+
+        photos = new ArrayList<InstagramPhoto>();
+        aPhotos = new InstagramPhotosAdapter(this, photos);
+
+        ListView lvPhotos = (ListView) findViewById(R.id.lvPhotos);
+        lvPhotos.setAdapter(aPhotos);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchPopularPhotos();
+            }
+        });
+        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
         fetchPopularPhotos();
     }
 
     private void fetchPopularPhotos() {
-        photos = new ArrayList<InstagramPhoto>();
-        aPhotos = new InstagramPhotosAdapter(this, photos);
+
         String popularUrl = "https://api.instagram.com/v1/media/popular?client_id=" + CLIENT_ID;
-        ListView lvPhotos = (ListView) findViewById(R.id.lvPhotos);
-        lvPhotos.setAdapter(aPhotos);
+
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(popularUrl, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                JSONArray photosJson = null;
+                JSONArray photosJson;
                 try {
                     photos.clear();
                     photosJson = response.getJSONArray("data");
+
                     for (int i = 0; i < photosJson.length(); i++) {
                         JSONObject photoJSON = photosJson.getJSONObject(i);
                         InstagramPhoto instagramPhoto = new InstagramPhoto();
+
+                        instagramPhoto.topComments = new ArrayList<Comment>();
+
                         instagramPhoto.username = photoJSON.getJSONObject("user").getString("username");
 
                             if (!photoJSON.isNull("caption")) {
@@ -55,13 +79,25 @@ public class PhotosActivity extends Activity {
                             instagramPhoto.imageHeight = photoJSON.getJSONObject("images").getJSONObject("standard_resolution").getInt("height");
                             instagramPhoto.imageUrl = photoJSON.getJSONObject("images").getJSONObject("standard_resolution").getString("url");
                             instagramPhoto.likesCount = photoJSON.getJSONObject("likes").getInt("count");
+                            instagramPhoto.username = photoJSON.getJSONObject("user").getString("username");
+                            instagramPhoto.profilePicUrl = photoJSON.getJSONObject("user").getString("profile_picture");
+
+
+
+                            for (int j = 0; j < 2; j++) {
+                                String commenter = photoJSON.getJSONObject("comments").getJSONArray("data").getJSONObject(j).getJSONObject("from").getString("username");
+                                String comment =  photoJSON.getJSONObject("comments").getJSONArray("data").getJSONObject(j).getString("text");
+                                instagramPhoto.topComments.add(new Comment(commenter, comment));
+                            }
 
                         photos.add(instagramPhoto);
                     }
-                    aPhotos.notifyDataSetChanged();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                aPhotos.notifyDataSetChanged();
+                swipeRefreshLayout.setRefreshing(false);
 
             }
 
