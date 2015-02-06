@@ -49,7 +49,7 @@ public class InstagramPhotosAdapter extends ArrayAdapter<InstagramPhoto> {
         imgPhoto.getLayoutParams().height = photo.imageHeight;
         imgPhoto.setImageResource(0);
 
-        Picasso.with(getContext()).load(photo.imageUrl).into(imgPhoto);
+        Picasso.with(getContext()).load(photo.imageUrl).placeholder(R.drawable.ic_launcher).into(imgPhoto);
         Picasso.with(getContext()).load(photo.profilePicUrl).into(imgProfilePic);
         return convertView;
     }

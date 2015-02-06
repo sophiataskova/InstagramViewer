@@ -52,7 +52,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center|left"
-                    android:text="Username"
                     android:textColor="#093A63"
                     android:textSize="20dp" />
             </LinearLayout>
@@ -84,7 +83,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="@string/hello_world"
                 android:textColor="#093A63"
                 android:textSize="10sp" />
 
@@ -95,8 +93,8 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="3"
-            android:padding="10dp"
-            android:text="Hello"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:textColor="#093A63" />
         <LinearLayout
             android:id="@+id/top_comments"
