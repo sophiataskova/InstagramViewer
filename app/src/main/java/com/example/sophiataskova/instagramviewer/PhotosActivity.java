@@ -1,11 +1,12 @@
 package com.example.sophiataskova.instagramviewer;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -18,12 +19,15 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 
-public class PhotosActivity extends Activity {
+public class PhotosActivity extends FragmentActivity {
 
     public static final String CLIENT_ID = "1f10807b32284294bedf56273ccd3627";
     private ArrayList<InstagramPhoto> photos;
+
     private InstagramPhotosAdapter aPhotos;
+
     private SwipeRefreshLayout swipeRefreshLayout;
+    private TextView seeAllButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +35,12 @@ public class PhotosActivity extends Activity {
         setContentView(R.layout.activity_photos);
 
         photos = new ArrayList<InstagramPhoto>();
+
         aPhotos = new InstagramPhotosAdapter(this, photos);
 
-        ListView lvPhotos = (ListView) findViewById(R.id.lvPhotos);
+        seeAllButton = (TextView) findViewById(R.id.view_all_comments_btn);
+
+        ListView lvPhotos = (ListView) findViewById(R.id.lv_photos);
         lvPhotos.setAdapter(aPhotos);
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
@@ -50,7 +57,14 @@ public class PhotosActivity extends Activity {
                 android.R.color.holo_red_light);
 
         fetchPopularPhotos();
+//        showCommentsDialog();
     }
+
+//    public void showCommentsDialog() {
+//        FragmentManager fm = getSupportFragmentManager();
+//        CommentsListFragment commentsListFragment = CommentsListFragment.newInstance("Some Title");
+//        commentsListFragment.show(fm, "fragment_edit_name");
+//    }
 
     private void fetchPopularPhotos() {
 
@@ -67,9 +81,10 @@ public class PhotosActivity extends Activity {
 
                     for (int i = 0; i < photosJson.length(); i++) {
                         JSONObject photoJSON = photosJson.getJSONObject(i);
-                        InstagramPhoto instagramPhoto = new InstagramPhoto();
+                        final InstagramPhoto instagramPhoto = new InstagramPhoto();
 
                         instagramPhoto.topComments = new ArrayList<Comment>();
+                        instagramPhoto.allComments = new ArrayList<Comment>();
 
                         instagramPhoto.username = photoJSON.getJSONObject("user").getString("username");
 
@@ -89,6 +104,12 @@ public class PhotosActivity extends Activity {
                                 String comment =  photoJSON.getJSONObject("comments").getJSONArray("data").getJSONObject(j).getString("text");
                                 instagramPhoto.topComments.add(new Comment(commenter, comment));
                             }
+
+                        for (int j = 0; j < photoJSON.getJSONObject("comments").getJSONArray("data").length(); j++) {
+                            String commenter = photoJSON.getJSONObject("comments").getJSONArray("data").getJSONObject(j).getJSONObject("from").getString("username");
+                            String comment =  photoJSON.getJSONObject("comments").getJSONArray("data").getJSONObject(j).getString("text");
+                            instagramPhoto.allComments.add(new Comment(commenter, comment));
+                        }
 
                         photos.add(instagramPhoto);
                     }
@@ -111,16 +132,12 @@ public class PhotosActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;

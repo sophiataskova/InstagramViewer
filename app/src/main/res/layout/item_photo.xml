@@ -41,6 +41,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingRight="10dp"
+                    android:paddingLeft="5dp"
                     android:scaleType="fitCenter"
                     app:riv_corner_radius="30dip"
                     app:riv_mutate_background="true"
@@ -69,7 +70,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp">
+            android:paddingTop="10dp"
+            android:paddingBottom="5dp">
             <ImageView
                 android:id="@+id/heart"
                 android:layout_width="wrap_content"
@@ -93,7 +95,6 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="3"
-            android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:textColor="#093A63" />
         <LinearLayout
@@ -101,6 +102,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical" />
+        <TextView
+            android:id="@+id/view_all_comments_btn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="#9DA3A6"
+            android:text="@string/view_all_btn_txt"
+            android:visibility="gone"/>
     </LinearLayout>
+
 
 </LinearLayout>
